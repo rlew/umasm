@@ -7,66 +7,63 @@
 #include "stack.h"
 #include "seq.h"
 
-static int MEM_SEG_LEN = 500;
+//PROBLEM: not passing things by reference / modifying within funcitons.
 
+static int MEM_SEG_LEN = 10;
 
-void verifyMapped(UArray_T memorySegments, Stack_T unmappedSegments) {
-    Stack_T verified = Stack_new();
+void verifyMapped(Seq_T memorySegments, Seq_T unmappedSegments) {
     // Verifies that the available unmapped segments is updated upon mapping
-    while(!Stack_empty(unmappedSegments)){
-        UM_Word* index = Stack_pop(unmappedSegments);
-        if(UArray_at(memorySegments, *index) != NULL){
-            fprintf(stderr, "unmapped segments not updated correctly\n");
+    for(int i = 0; i < Seq_length(unmappedSegments); i++){
+        UM_Word index = *(UM_Word*)Seq_get(unmappedSegments, i);
+        if((UArray_T)Seq_get(memorySegments, index) != NULL){
+            fprintf(stderr, 
+                    "Unmapped segments not updated correctly for: %u\n", 
+                    index);
             exit(1);
         }
-        Stack_push(unmappedSegments, &index);
     }
-    unmappedSegments = verified;
-    Stack_free(&verified);
 
-    for(int i = 1; i < MEM_SEG_LEN; i++) {
-        if (UArray_at(memorySegments, i) != NULL) {
-            for(int j = 0; j < Seq_length(UArray_at(memorySegments, i)); j++) {
+    for(int i = 0; i < MEM_SEG_LEN; i++) {
+        UArray_T segments = (UArray_T)Seq_get(memorySegments, i);
+        if (segments != NULL) {
+            for(int j = 0; j < UArray_length(segments); j++) {
                 // Each 32-bit word must be initialized to 0
-                if((Seq_get(UArray_at(memorySegments, i), j)) != 0) {
-                    fprintf(stderr, "segment incorrectly initialized");
+                printf("memseg: %u\n", *(UM_Word*)UArray_at(segments, j));
+                if(*(UM_Word*)UArray_at(segments, j) != 0) {
+                    fprintf(stderr, "segment incorrectly initialized\n");
                     exit(1);
                 }
             }
         }
     }
+    printf("Verified bitch.\n");
 }
 
 int main(int argc, char* argv[]) {
     (void) argc; (void) argv;
-    UArray_T memorySegments = UArray_new(MEM_SEG_LEN, sizeof(UM_Word*));
-    Stack_T unmappedSegs = Stack_new();
-    Stack_T unmappedSegs2 = Stack_new();
-    for(UM_Word i = MEM_SEG_LEN - 1; i >= 1; i--) {
-        Stack_push(unmappedSegs, &i);
-        Stack_push(unmappedSegs2, &i);
-    }
+    Mem* mem;
+    NEW(mem);
+    instantiateMem(mem, MEM_SEG_LEN);
 
-    UM_Word index = nextIndexToMap(unmappedSegs);
-    mapSegment(memorySegments, index, 10);
-    verifyMapped(memorySegments, unmappedSegs);
-
-    unmapSegment(memorySegments, index);
-    unmapIndex(unmappedSegs, index);
-    verifyMapped(memorySegments, unmappedSegs);
+    UM_Word index = mapSegment(mem, 10);
+    printf("mapped index: %u\n", index);
+    verifyMapped(mem->mappedIDs, mem->unmappedIDs);
 
     UM_Word value = 20;
-    segmentedStore(memorySegments, 1, 0, value);
+    segmentedStore(mem, 0, 9, value);
 
-    if(segmentedLoad(memorySegments, 1, 0) != value) {
+    if(segmentedLoad(mem, 0, 9) != value) {
         fprintf(stderr, "incorrect load and store");
         exit(1);
     }
+    else {
+        printf("value: %u\n", segmentedLoad(mem, 0, 9));
+        printf("Woohoo! Correct seg store and load!\n");
+    }
+    
+    unmapSegment(mem, index);
+    verifyMapped(mem->mappedIDs, mem->unmappedIDs);
 
-    // Should fail because it will attempt to map the same ID to another
-    // segment
-    index = nextIndexToMap(unmappedSegs2);
-    mapSegment(memorySegments, index, 1);
-
+    freeMem(mem);
     return 0;
 }

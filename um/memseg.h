@@ -1,14 +1,22 @@
+#ifndef MEMSEG_INCLUDED
+#define MEMSEG_INCLUDED
 #include <stdlib.h>
 #include <stdint.h>
-#include "stack.h"
-#include "uarray.h"
+#include "seq.h"
 
 typedef uint32_t UM_Word;
 
-void mapSegment(UArray_T memorySegments, UM_Word index, int length);
-void unmapSegment(UArray_T memorySegments, UM_Word index);
-UM_Word segmentedLoad(UArray_T memorySegments, int ID, int offset);
-void segmentedStore(UArray_T memorySegments, int ID, int offset, UM_Word
+typedef struct Mem{
+    Seq_T mappedIDs;
+    Seq_T unmappedIDs;
+    int i;
+}Mem;
+
+void instantiateMem(Mem* memorySegments, int length);
+UM_Word mapSegment(Mem* memorySegments, int length);
+void unmapSegment(Mem* memorySegments, UM_Word index);
+UM_Word segmentedLoad(Mem* memorySegments, int ID, int offset);
+void segmentedStore(Mem* memorySegments, int ID, int offset, UM_Word
                        value);
-UM_Word nextIndexToMap(Stack_T unmappedSegs);
-void unmapIndex(Stack_T unmappedSegs, UM_Word index);
+void freeMem(Mem* memorySegments);
+#endif
