@@ -1,0 +1,39 @@
+Matt Frey
+Rachel Lew
+
+DESIGN
+    1. Representation of Sequence of Sections
+        Because the sections need to be both ordered and accessible by name,
+        we will represent them as a Table where the keys are the names of the
+        sections and the values are pointers to the actual section. We will
+        also use a Sequence to preserve the order in which the sections are
+        added, the values pointing to the same sections as in the table.
+
+        Each section will be reprsented as a Sequence, allowing us to append
+        UM words to each section as needed.
+
+        The current section will be a pointer to the section that is currently
+        being appended to.
+
+        The error function pointer will be stored along with the error state
+        as specified by the new function.
+        
+    2. World of Ideas
+        Our representation allows us to access instructions stored in
+        different sections according to both name and index. Sections are the
+        large subsets of the complete set of UM words to be stored, and
+        instructions are the building blocks of those sections.
+
+    3. Invariants
+        The order of sections in the sequence of sections is the order in
+        which they are added.
+
+        The order of instructions in each section is the order in which they
+        are added.
+
+        If a section exists (is named) in the table of sections, it must also
+        exist in the sequence of sections.
+
+        The current section is never NULL. Upon creation of the sequence of
+        sections, the initial section in the sequence is made the current
+        section.

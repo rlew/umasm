@@ -1,0 +1,16 @@
+// copy standard input to standard output
+
+.zero r0   // promise this register will always be zero
+.temps r7  // the assembler may overwrite 
+           // this register at will
+L:
+r1 := input()
+// if r1 is all ones, goto exit, else goto write
+r2 := r1 nand r1
+r3 := exit
+if (r2 != 0) r3 := write
+goto r3
+write: output r1
+goto L
+exit: halt
+

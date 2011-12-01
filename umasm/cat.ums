@@ -1,0 +1,10 @@
+r1 := input()
+r2 := r1 nand r1
+r3 := 9
+r7 := 6
+if (r2 != 0) r3 := r7
+goto r3 in program m[r0]
+output r1
+r7 := 0
+goto r7 in program m[r0]
+halt
