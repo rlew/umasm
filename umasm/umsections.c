@@ -47,9 +47,7 @@ void Umsections_free(T *asmp) {
 }
 
 int Umsections_error(T asm, const char *msg){
-    (void)asm;
-    fprintf(stderr, msg);
-    return 1;
+    return asm->error(asm->errstate, msg);
 }
 
 void Umsections_section(T asm, const char *section){

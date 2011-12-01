@@ -1,0 +1,6 @@
+.temp r1
+.zero r0
+
+r2 := 134217727
+output r2;
+halt

@@ -1,0 +1,36 @@
+.zero r0
+.temp r1
+
+// move and subtract
+r2 := 98
+r4 := 1
+r3 := r2
+r5 := r2 - r4
+output r5
+r5 := r3 - r4
+output r5
+
+// complement
+r2 := ~r2
+r2 := ~r2
+output r2
+
+// negation
+r2 := r2 + 1
+r2 := -r2
+r2 := -r2
+output r2
+
+// bitwise and
+r5 := ~r0
+r5 := r0 & r5
+r2 := r2 + 1
+r2 := r5 + r2
+output r2
+
+//bitwise or
+r5 := 1
+r6 := 2
+r6 := r5 | r6
+r5 := r6 + 98
+output r5
